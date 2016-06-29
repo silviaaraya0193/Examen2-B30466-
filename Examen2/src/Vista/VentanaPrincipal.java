@@ -8,9 +8,6 @@ package Vista;
 import Controlador.ControladorPrincipal;
 import Modelo.Servidor;
 import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JRadioButton;
-import javax.swing.JTextField;
 
 /**
  *
@@ -22,6 +19,8 @@ public class VentanaPrincipal extends javax.swing.JFrame {
      * Creates new form VentanaPrincipal
      */
     private Servidor server;
+    private static int valor;
+    
     public VentanaPrincipal() {
         initComponents();
         ControladorPrincipal controladorP = new ControladorPrincipal(this,server);
@@ -30,6 +29,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         group.add(radio_difusion);
         group.add(radio_grupal);
         group.add(radio_privado);
+        //valor = Integer.parseInt(txt_puerto.getText());
         this.setLocationRelativeTo(null);
     }
 
@@ -65,9 +65,10 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     public String getIP() {
         return txt_ip.getText();
     }
-
-    public String getPuerto() {
-        return txt_puerto.getText();
+     
+    public static int getPuerto() {
+        
+        return valor;
     }
 
     public void setNombre(String nombre) {
@@ -78,8 +79,8 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         this.txt_ip.setText(ip);
     }
 
-    public void setPuerto(String puerto) {
-        this.txt_puerto.setText(puerto);
+    public void setPuerto(int puerto) {
+        this.txt_puerto.setText(Integer.toString(puerto));
     }
 
     /**

@@ -23,6 +23,7 @@ public class ControladorChat implements ActionListener{
     private VentanaChat ventana;
     private DataOutputStream salida;
     private CryptSecurity cifrador;
+    
     public ControladorChat(VentanaChat ventana){
         this.ventana = ventana;
         cifrador = new CryptSecurity();
@@ -36,12 +37,12 @@ public class ControladorChat implements ActionListener{
             if(getSocket() != null){
                 if(ventana.validarMensaje()){
                     try {
-                        String msj = ""+ventana.getMensaje();
+                        String msj=ventana.getMensajeCifrado(ventana.getTipoChat());
                         salida = new DataOutputStream(getSocket().getOutputStream());
-                        cifrador.crypt(msj);
-                        ventana.setMensaje(msj);
+                        ventana.setMensajeDescifrado(msj);
                         salida.writeUTF(msj);
                         ventana.limpiarMensaje();
+                        
                     } catch (IOException ex) {
                         System.out.println("Error en el enviar del controlador chat");
                     } catch (Exception ex) {

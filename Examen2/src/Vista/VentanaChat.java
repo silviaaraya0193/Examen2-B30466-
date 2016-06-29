@@ -6,11 +6,9 @@
 package Vista;
 
 import Controlador.ControladorChat;
+import Modelo.Cliente;
 import Modelo.CryptSecurity;
 import java.net.Socket;
-import javax.swing.JLabel;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
 
 /**
  *
@@ -21,67 +19,127 @@ public class VentanaChat extends javax.swing.JFrame {
     /**
      * Creates new form VentanaChat
      */
-      private Socket socket;
-      private CryptSecurity cifrador;
-    public VentanaChat() {
+    private Socket socket;
+    private CryptSecurity cifrador;
+    private Cliente cliente;
+    private String tipoChat;
+    
+    public VentanaChat(String tipoChat) {
         initComponents();
         ControladorChat controladorC = new ControladorChat(this);
         setActionCommand(controladorC);
+        cliente = new Cliente(socket, this);
+        cliente.start();
         cifrador = new CryptSecurity();
+        this.tipoChat=tipoChat;
         this.setLocationRelativeTo(null);
-        
+
     }
-    private void setActionCommand(ControladorChat controladorC){
+
+    private void setActionCommand(ControladorChat controladorC) {
         btn_enviar.addActionListener(controladorC);
         btn_salir.addActionListener(controladorC);
     }
-    public String getNombreChat(){
+
+    public String getNombreChat() {
         return txt_nombreChat.getText();
     }
-    public void setSocket(Socket socket){
-       this.socket=socket;
+
+    public void setSocket(Socket socket) {
+        this.socket = socket;
     }
-    
-    public Socket getSocket(){
+
+    public Socket getSocket() {
         return socket;
     }
 
-    public void setMensaje(String mensaje) throws Exception{
-        cifrador.DeCrypt(mensaje);
-        txt_chat.append(" \n"+getNombreChat()+": "+mensaje);
+    public void setMensaje(String mensaje) throws Exception {
+        // cifrador.DeCrypt(mensaje);
+        txt_chat.append(" \n" + getNombreChat() + ": " + mensaje);
     }
-     public void setNombre(String nombre){
-       this.lbl_name.setText(nombre);
-   }
-    
-   public void setIP(String ip){
-       this.lbl_ip.setText(ip);
-   }
-   public void setPuerto(String puerto){
-       this.lbl_puerto.setText(puerto);
-   }
-   public String getNombreUsuario(){
-       return lbl_name.getText();
-       
-   }
-   public String getIP(){
-       return lbl_ip.getText();
-   }
-   public int getPuerto(){
-       return Integer.parseInt(lbl_puerto.getText());
-   }
-    public boolean validarMensaje(){
-        if(txt_mensaje.getText().equalsIgnoreCase("")){
+
+    public void setMensajeDescifrado(String mensaje) {
+        String message = "";
+        message = getMensajeDescifrado(mensaje);
+        txt_chat.append(message+"\n");
+    }
+
+    public void setNombre(String nombre) {
+        this.lbl_name.setText(nombre);
+    }
+
+    public void setIP(String ip) {
+        this.lbl_ip.setText(ip);
+    }
+
+    public void setPuerto(String puerto) {
+        this.lbl_puerto.setText(puerto);
+    }
+
+    public String getNombreUsuario() {
+        return lbl_name.getText();
+
+    }
+
+    public String getIP() {
+        return lbl_ip.getText();
+    }
+
+    public int getPuerto() {
+        return Integer.parseInt(lbl_puerto.getText());
+    }
+
+    public boolean validarMensaje() {
+        if (txt_mensaje.getText().equalsIgnoreCase("")) {
             return false;
-        }else{
+        } else {
             return true;
         }
     }
-  public String getMensaje(){
+
+    
+    public String getTipoChat(){
+        return tipoChat;
+    }
+    
+    public String getMensaje() {
         return txt_mensaje.getText();
     }
-  public void limpiarMensaje(){
+
+    public void limpiarMensaje() {
         txt_mensaje.setText("");
+    }
+
+    public String getMensajeDescifrado(String mensaje) {
+        String decodeText = "";
+        String[] lista;
+        try {
+            decodeText = cifrador.DeCrypt(mensaje);
+            
+            lista = decodeText.split(",");
+            
+            decodeText=lista[1];
+            
+        } catch (Exception ex) {
+            System.out.println("Lo sentimos, ha ocurrido un error mientras se decodifica el mensaje");
+        }
+        System.out.println("El mensaje ha sido descifrado:  " + decodeText);
+        return decodeText;
+    }
+
+    public String getMensajeCifrado(String tipo) {
+        String mensaje = "";
+        switch (tipo) {
+            case "Difusion": mensaje = cifrador.crypt("Difusion,"+txt_mensaje.getText());
+                break;
+            case "Grupal": mensaje = cifrador.crypt("Grupal,"+txt_mensaje.getText());
+                break;
+            case "Privado":mensaje = cifrador.crypt("Privado,"+txt_mensaje.getText());
+                break;
+        }
+        
+        System.out.println("El mensaje cifrado es: " + mensaje);
+        return mensaje;
     }
 
     /**

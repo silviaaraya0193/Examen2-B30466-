@@ -7,20 +7,19 @@ package Modelo;
 
 import Vista.VentanaChat;
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.net.Socket;
 
 /**
  *
  * @author viccr
  */
-public class HiloCliente extends Thread{
+public class HiloDifusion extends Thread{
     
     private VentanaChat chat;
     private Socket socket;
     private DataInputStream entrada;
     
-    public HiloCliente(VentanaChat chat, Socket socket){
+    public HiloDifusion(VentanaChat chat, Socket socket){
         this.chat = chat;
         this.socket = socket;
     }
@@ -32,7 +31,7 @@ public class HiloCliente extends Thread{
             try {
                 entrada = new DataInputStream(socket.getInputStream());
                 mensaje = entrada.readUTF();
-                chat.setMensaje(mensaje);
+                //chat.setMensajeDescifrado(mensaje);
             } catch (Exception e) {
                 System.out.println("");
             }

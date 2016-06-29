@@ -5,13 +5,11 @@
  */
 package Modelo;
 
-import Vista.VentanaChat;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+
 
 /**
  *
@@ -20,19 +18,19 @@ import java.util.Map;
 public class Servidor extends Thread {
 
     private ServerSocket server;
-    private ArrayList<Hilo> array;
-    private HashMap<String,ArrayList> hash;
+    private static ArrayList<Hilo> array;
+    private int port;
+   // private static HashMap<String,ArrayList> hash;
     private Lock lock;
     private Hilo hilo;
-    private VentanaChat ventanaC;
+    Socket socket;
 
-    public Servidor(int num) {
+    public Servidor(int port) {
         try {
-            server = new ServerSocket(num);
-            this.ventanaC = ventanaC;
+            this.port = port;
             array = new ArrayList<>();
-            hash = new HashMap<>();
-            hash.put("Difusion", array);
+           // hash = new HashMap<>();
+            //hash.put("Difusion", array);
             lock = new Lock();
         } catch (Exception e) {
             System.out.println("Error en el constructor del servidor");
@@ -41,45 +39,52 @@ public class Servidor extends Thread {
 
     @Override
     public void run() {
-        int pos = 0;
+       while(true){
+           conectar();
+       }
+    }
+    public void conectar(){
+         int pos = 0;
+        //int cont=0; 
+        try {
+            server = new ServerSocket(8080);
         while (true) {
-            Socket socket;
-            try {
-                System.out.println("Esperando conexion...");
+           System.out.println("Esperando conexion...");
                 socket = server.accept();
                 System.out.println("conexion exitosa");
+                //chatnae = "chat"+cont;
+                //cont++;
                 //cliente /conect nuevochat nombrechat true si es priviado o grupo 
-                hilo = new Hilo("Nombre: " + ventanaC.getNombreChat(), this, socket);
-                hilo.start();
-                pos++;
+                hilo = new Hilo("NameChat","Hilo: ", this, socket);
                 array.add(hilo);
-            } catch (IOException ex) {
-                System.out.println("Error en el run de la clase servidor");
+                //hash.put("Difusion", array);
+                hilo.start();
+                //System.out.println("Hilo del servidor: "+hilo.toString());
+                pos++;
+           
             }
+        } catch (IOException ex) {
+                System.out.println("Error en el run de la clase servidor");
         }
     }
-
-    public void escribirTodos(String nombre, String mensaje) {
+    public void escribirTodos(String nameChat,String nombre, String mensaje) {
+        System.out.println("Hola entro al escribir todos");
         try {
             Hilo hilo1;
             lock.lock();
-            for (int i = 0; i < array.size(); i++) {
-                hilo1 = array.get(i);
-                hilo1.escribir(nombre, mensaje);
-            }
+            ArrayList arrayLocal;
+            arrayLocal = new ArrayList<>();
+            arrayLocal = hilo.hash.get(nameChat);
+            System.out.println("el arrayTiene: "+arrayLocal);
+           for (int i = 0; i < arrayLocal.size(); i++) {
+               hilo1 = (Hilo) arrayLocal.get(i);
+               hilo1.escribir(nombre, mensaje); 
+           }
             lock.unlock();
 
         } catch (InterruptedException ex) {
             System.out.println("Error en el escribir Todos de la clase servidor");
         }
-    }
-
-    public HashMap<String, ArrayList> getHash() {
-        return hash;
-    }
-
-    public void setHash(HashMap<String, ArrayList> hash) {
-        this.hash = hash;
     }
 
     public ArrayList<Hilo> getArray() {
@@ -89,9 +94,14 @@ public class Servidor extends Thread {
     public void setArray(ArrayList<Hilo> array) {
         this.array = array;
     }
-   
+    @Override
+    public void start(){
+        Thread t = new Thread(this);
+        t.start();
+    }
     public static void main(String[] args) {
-        Servidor server = new Servidor(6666);
+        Servidor server = new Servidor(8080);
         server.start();
     }
+    
 }
